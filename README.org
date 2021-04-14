@@ -1,7 +1,8 @@
 #+TITLE: emacs-gcc-pgtk - Dockerfile for building emacs.deb with native-comp and pure GTK
 
 * Summary
-This repository shows a Dockerfile to create a emacs deb package with native compilation and pure GTK. 
+This repository shows a Dockerfile to create a emacs deb package with
+native compilation and pure GTK for Ubuntu 20.04.
 
 ** Notes:
 1. The deb package can be found in [[https://github.com/konstare/emacs-gcc-pgtk/actions/workflows/deploy.yml?query=is%3Acompleted][GitHub Action]].
@@ -12,12 +13,13 @@ This repository shows a Dockerfile to create a emacs deb package with native com
 ** The package is compiled with flags:
 + --with-native-compilation
 + --with-pgtk
-+ --with-mailutils
++ --without-mailutils
++ --without-pop
 + --without-xwidgets
 + --with-modules
 + --with-json
 + --without-makeinfo
-+ CFLAGS="-O2 -pipe"
++ CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
 
 * Installation 1: Use [[https://github.com/konstare/emacs-gcc-pgtk/actions][GitHub Actions]]
 The deb package with this recipe is built by =github= and can be found in [[https://github.com/konstare/emacs-gcc-pgtk/actions/workflows/deploy.yml?query=is%3Acompleted][GitHub Action]].
@@ -32,7 +34,7 @@ If the deb package is too old:
 1. docker
 ** Compilation 
 #+begin_src bash
-git clone https://github.com/konstare/emacs-gcc-pgtk
+git clone https://github.com/cesarolea/emacs-gcc-pgtk
 cd emacs-gcc-pgtk
 ./build.sh
 #+end_src
