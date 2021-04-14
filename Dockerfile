@@ -1,10 +1,16 @@
-FROM ubuntu:20.10
+FROM ubuntu:20.04
 WORKDIR /opt
 ENV DEBIAN_FRONTEND=noninteractive
-ENV JOBS=5
+
+RUN apt-get update && apt-get install -y software-properties-common
+RUN add-apt-repository -y ppa:ubuntu-toolchain-r/ppa && apt update
+RUN apt-get install -y libxpm-dev libgif-dev libjpeg-dev libpng-dev \
+  libtiff-dev libx11-dev libncurses5-dev automake autoconf texinfo \
+  libgtk2.0-dev gcc-10 g++-10 libgccjit0 libgccjit-10-dev libjansson4 \
+  libjansson-dev
 
 RUN sed -i 's/# deb-src/deb-src/' /etc/apt/sources.list &&\
-    apt-get update && apt-get install --yes --no-install-recommends  \
+    apt-get install --yes --no-install-recommends  \
     apt-transport-https\
     ca-certificates\
     build-essential \
@@ -40,6 +46,7 @@ RUN update-ca-certificates \
 
 # Build
 ENV CC="gcc-10"
+ENV CXX="gcc-10"
 RUN ./autogen.sh && ./configure \
     --prefix "/usr/local" \
     --with-native-compilation \
@@ -50,10 +57,11 @@ RUN ./autogen.sh && ./configure \
     --without-xwidgets \
     --without-toolkit-scroll-bars \
     --without-xaw3d \
-    --with-mailutils \
-    CFLAGS="-O2 -pipe"
+    --without-mailutils \
+    --without-pop \
+    CFLAGS="-O3 -mtune=native -march=native -fomit-frame-pointer"
 
-RUN make NATIVE_FULL_AOT=1 -j ${JOBS}
+RUN make NATIVE_FULL_AOT=1 -j $(nproc)
 
 # Create package
 RUN EMACS_VERSION=$(sed -ne 's/AC_INIT(GNU Emacs, \([0-9.]\+\), .*/\1/p' configure.ac) \
