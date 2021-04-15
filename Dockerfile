@@ -44,6 +44,9 @@ RUN update-ca-certificates \
     && git clone --depth 10 https://github.com/flatwhatson/emacs -b pgtk-nativecomp emacs \
     && mv emacs/* .
 
+RUN sed -i "/(defmacro define-obsolete-function-alias/c\(defmacro define-obsolete-function-alias ( obsolete-name current-name" ./lisp/emacs-lisp/byte-run.el
+RUN sed -i "/                                           &optional docstring)/c\                                           &optional when docstring)" ./lisp/emacs-lisp/byte-run.el
+
 # Build
 ENV CC="gcc-10"
 ENV CXX="gcc-10"
